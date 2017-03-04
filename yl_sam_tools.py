@@ -20,10 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""The module contains a few tools useful for handling NGS data.
-    The initial aim of this module is to attach molecular barcodes (randomers)
-    extracted during fastq processing (as part of the sequence name) to the
-    BT&QT tag field in the sam file so that the picard tool can MarkDuplicates.
+""" The initial aim of this module is to attach randomers (molecular barcodes)
+    extracted during fastq processing (as part of the read's name) to the
+    BT&QT tag in the sam file so that the Picard tool can MarkDuplicates using
+    the BARCODE_TAG option.
 """
 import argparse
 import itertools
@@ -31,16 +31,16 @@ import pysam
 
 
 def attach_barcode(sam, output):
-    """Attach molecular barcodes (randomers) to the BC&QT tag in the sam file.
+    """Attach randomers (molecular barcodes) to the BC&QT tag in the sam file.
     Args:
         sam: A sam file which needs to attach barcodes at BC&QT tags. The
-            barcode and its sequencing quality should be stored in the read's
-            name, separated by ":". Check the "process_fastq" function for
-            details.
-        output: Path for a unsorted sam file output. Default path is the current
-            working directory (os.getcwd()) and the default name is to add a
+            barcode and its sequencing quality should have been stored in the
+            read's name, separated by ":". The "yl_fastq_tools" module can
+            extract randomers accordingly. Check it for details.
+        output: Name for an unsorted sam file output. Default name is to add a
             "_bcqt" postfix to the name of the input sam file.
     """
+    
     if output is None:
         output = sam.replace('.sam', '_bcqt.sam')
     infile = pysam.AlignmentFile(sam, "r")
@@ -60,38 +60,26 @@ def attach_barcode(sam, output):
 
 
 def main():
-    """Use the main() function to test major functions of this toolkit:
-        - Process fastq file
-        - Attach molecular barcodes (randomers) to the BC&QT tag of a sam file.
+    """Use the main() function to test this module:
+        - Attach randomers (molecular barcodes) to the BC&QT tag of a sam file.
     """
 
-    parser = argparse.ArgumentParser(description='Yunhai Luo\'s toolkit')
-    subparsers = parser.add_subparsers(dest='subcom')
-
-    # Sub-command for attaching randomer sequences to the BC&QT tag, which will
-    # be used by picard for "MarkDuplicates".
-    parser_attach = subparsers.add_parser('attach_sam',
-                                          help='Attach barcodes to the BC&QT '
-                                               'tag in one aligned sam file.')
-    parser_attach.add_argument('-s', '--sam',
-                               help='One aligned sam file which needs to attach'
-                                    ' barcodes at BC&QT tags. The barcode and '
-                                    'its sequencing quality should be stored in'
-                                    'the read\'s name, separated by ":". Check '
-                                    '"process_fastq" sub-command for details.',
-                               required=True)
-    parser_attach.add_argument('-o', '--outsam',
-                               help='Output unsorted sam file. Default is to '
-                                    'add a "_bcs" postfix and save in the same'
-                                    ' directory.',
-                               default=None)
+    parser = argparse.ArgumentParser(description='Attach randomers (in read\'s '
+                                                 'name) to the BC&QT tag')
+    parser.add_argument('-s', '--sam',
+                        help='One aligned sam file which needs to attach '
+                             'barcodes at BC&QT tags. The barcode and its '
+                             'sequencing quality should have been stored in the'
+                             ' read\'s name, separated by ":". Check '
+                             '"yl_fastq_tools" module for detailed formats.',
+                        required=True)
+    parser.add_argument('-o', '--outsam',
+                        help='Output unsorted sam file. Default is to add a '
+                             '"_bcs" postfix and save in the same directory.',
+                        default=None)
 
     args = parser.parse_args()
-    if args.subcom == 'attach_sam':
-        attach_barcode(args.sam, args.outsam)
-    else:
-        parser.print_help()
-        exit(1)
+    attach_barcode(args.sam, args.outsam)
 
 
 if __name__ == '__main__':
