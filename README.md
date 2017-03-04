@@ -6,9 +6,9 @@ A collection of bioinformatic tools customized to my needs.
   - [yl_fastq_tools](#user-content-yl_fastq_tools)
   - [yl_sam_tools](#user-content-yl_sam_tools)
 - [Process randomer for Picard on marking PCR duplicates](#user-content-process-randomer-for-picard-on-marking-pcr-duplicates)
-  - [1. Extract randomer from fastq](#user-content-extract-randomer-from-fastq)
-  - [2. Attach randomer to the BC&QT tag in the sam file](#user-content-attach-randomer-to-the-bcqt-tag-in-the-sam-file)
-  - [3. Picard MarkDuplicates with BARCODE_TAG option](#user-content-picard-markduplicates-with-barcode_tag-option)
+  - [1. Extract randomer from fastq](#user-content-1-extract-randomer-from-fastq)
+  - [2. Attach randomer to the BC&QT tag in the sam file](#user-content-2-attach-randomer-to-the-bcqt-tag-in-the-sam-file)
+  - [3. Picard MarkDuplicates with BARCODE_TAG option](#user-content-3-picard-markduplicates-with-barcode_tag-option)
 
 ## Usage
 ### yl_fastq_tools
