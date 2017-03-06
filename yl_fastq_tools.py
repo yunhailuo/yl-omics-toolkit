@@ -308,54 +308,62 @@ def main():
         - Process fastq file
     """
 
-    parser = argparse.ArgumentParser(description='Yunhai Luo\'s toolkit')
-    subparsers = parser.add_subparsers(dest='subcom')
-
-    # Sub-command for processing fastq: attach randomer to sequence name,
-    # clip sequences and demultiplex fastq according to given indices.
-    parser_extract = subparsers.add_parser('process_fastq',
-                                           help='Extract barcodes from one '
-                                                'fastq file and save them in '
-                                                'the read name.')
-    parser_extract.add_argument('-f', '--fastq',
-                                help='One fastq file to be processed',
-                                required=True)
-    parser_extract.add_argument('-b', '--barcode',
-                                help='Basepair position for molecular barcode '
-                                     '(randomer) which help remove duplicates. '
-                                     'Support both discrete and continuous '
-                                     'regions. Discrete regions are separated '
-                                     'by ",", and continuous region is '
-                                     'expressed as "a:b".',
-                                default=None)
-    parser_extract.add_argument('-s', '--slice',
-                                help='Basepair position for target sequences to'
-                                     ' keep. Support both discrete and '
-                                     'continuous regions. Discrete regions are '
-                                     'separated by ",", and continuous region '
-                                     'is expressed as "a:b".',
-                                default=None)
-    parser_extract.add_argument('-i', '--index',
-                                help='Basepair position for indexes which help '
-                                     'demultiplex reads. File names for '
-                                     'corresponding reads should be specified '
-                                     'in the "outfastq" option (check it for '
-                                     'details). Support both discrete and '
-                                     'continuous regions. Discrete regions are '
-                                     'separated by ",", and continuous region '
-                                     'is expressed as "a:b".',
-                                default=None)
-    parser_extract.add_argument('-o', '--outfastq',
-                                help='Output fastq file. For single file '
-                                     'output, the default is to add a "_proced"'
-                                     ' postfix and save in the same directory. '
-                                     'For demultiplexing, the expected format '
-                                     'is "index1-1,index1-2,index1-3,...:'
-                                     'filename1;index2-1,index2-2,index2-3,...:'
-                                     'filename2;...". No space is allowed. '
-                                     '"N" is supported in indexes but not '
-                                     'sequencing results',
-                                default=None)
+    parser = argparse.ArgumentParser(description='Pre-procees one fastq file '
+                                                 'for downstream analysis.')
+    parser.add_argument('-f', '--fastq',
+                        help='One fastq file to be processed',
+                        required=True)
+    parser.add_argument('-s', '--sequence',
+                        help='Basepair position for target sequences which '
+                             'should be kept for downstream analysis. Support '
+                             'both continuous and gapped regions. Use syntax '
+                             '\'start1:stop1,start2:stop2,...\'. Both the start'
+                             ' and the end are included. If a stop is omitted, '
+                             'start-stop pairs after it will be ignored and '
+                             'sequencing bases will be kept up to the end. If '
+                             'this option is omitted, the whole sequence will '
+                             'be kept. However, at least one of the \'-s\', '
+                             '\'-i\'+\'-b\' and \'-r\' options must be '
+                             'provided.',
+                        default=None)
+    parser.add_argument('-i', '--barcode-index',
+                        help='Basepair position for library barcodes which help'
+                             ' demultiplex reads. Barcode sequences and '
+                             'corresponding output file names must be provided'
+                             ' in the \'-b\' option (check it for details). '
+                             'Support both continuous and gapped regions. Use '
+                             'syntax \'start1:stop1,start2:stop2,...\'. The '
+                             'syntax specification is the same as \'-s\' option'
+                             ' above (check it for details). At least one of '
+                             'the \'-s\', \'-i\'+\'-b\' and \'-r\' options must'
+                             ' be provided.',
+                        default=None)
+    parser.add_argument('-b', '--barcode-file',
+                        help='Barcode sequences and corresponding output file '
+                             'names for demultiplexing. Use syntax '
+                             '\'barcode1-1,barcode1-2,barcode1-3,...:filename1;'
+                             'barcode2-1,barcode2-2,barcode2-3,...:filename2;'
+                             '...\'. No space is allowed. "N" is supported in '
+                             'barcodes but not in read sequences. At least one '
+                             'of the \'-s\', \'-i\'+\'-b\' and \'-r\' options '
+                             'must be provided.',
+                        default=None)
+    parser.add_argument('-r', '--randomer',
+                        help='Basepair position for randomer '
+                             '(molecular barcode) which help remove PCR '
+                             'duplicates generated during library preparation. '
+                             'It will be extracted and saved in corresponding '
+                             'reads\' name temporarily. Later in the pipeline '
+                             '(in the sam file), it can be moved to the BC&QT '
+                             'tag which can be utilized by the Picard tool for '
+                             'marking/removing duplicates. Support both '
+                             'continuous and gapped regions. Use syntax '
+                             '\'start1:stop1,start2:stop2,...\'. The syntax '
+                             'specifications are the same as \'-s\' option '
+                             'above (check it for details). At least one of the'
+                             ' \'-s\', \'-i\'+\'-b\' and \'-r\' options must be'
+                             ' provided.',
+                        default=None)
 
     args = parser.parse_args()
     if args.subcom == 'process_fastq':

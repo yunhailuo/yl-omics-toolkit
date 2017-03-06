@@ -65,7 +65,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser(description='Attach randomers (in read\'s '
-                                                 'name) to the BC&QT tag')
+                                                 'name) to the BC&QT tag.')
     parser.add_argument('-s', '--sam',
                         help='One aligned sam file which needs to attach '
                              'barcodes at BC&QT tags. The barcode and its '
