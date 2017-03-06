@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""The module contains a few tools useful for handling NGS data.
-    The initial aim of this module is to extract molecular barcodes (randomers)
+"""The module contains a few tools useful for handling fastq file of NGS data.
+    The initial aim of this module is to extract randomers (molecular barcodes)
     from fastq sequences and use these info after alignment to remove PCR
     duplicates through BT&QT tags in the sam file and picard's MarkDuplicates
     functionality combinatorially.
@@ -30,11 +30,51 @@ import argparse
 import itertools
 
 
+def fastq_reader(fastq):
+    """Get reads from fastq file.
+    A generator function which iterates over a fastq file and returns fastq 
+    reads by reading in 4 lines at a time. Every read will be returned  as a 
+    list of 4. As for now, the fastq file won't be validated. Thus errors 
+    won't be detected or handled properly.
+    Arg:
+        fastq: Path, including name, of one fastq file.
+    Yield:
+        A list with 4 elements having the expected order of seqence ID,
+        sequence, Phred Quality Scores ID, and Phred Quality Scores. For
+        example:
+        ['@M02357:256:000000000-ARWLK:1:1101:17612:1950 1:N:0:1',
+         'TTAGTTTCGTGTGGAAAGGACGAAACACCGCCTCGAGACTCGTTTACTAGGTTTAAGAGCTATGCT',
+         '+',
+         '>>11>DDD1C1>11111A11B0000A0FE0AEEA////A11/BEF/1A210DDGB2111BF1F1FG']
+    Notes:
+        Fastq file won't be validated. Therefore, blank or non-fastq line(s) in
+        the file may knock off (shift) the expect frame of fastq reads. Also, if
+        there are more than one blank lines at the end of file, all but the last
+        blank line will be returned as ''.
+    """
+
+    with open(fastq) as fastq_file:
+        while True:
+            read = [line.rstrip('\n') for line in itertools.islice(fastq_file,
+                                                                   4)]
+            if not read:
+                break
+            else:
+                yield read
+
+
+def _fastq_slicer(idxs-arg):
+
+
+def fastq_writer():
+
+
 def fastq_reads(fastq):
     """Get reads from fastq file.
-    A generator function which iterates over and returns fastq reads by reading
-    in 4 lines a time and return the read as a list of 4. Fastq file won't be
-    validated. Thus errors won't be detected or handled properly.
+    A generator function which iterates over a fastq file and returns fastq 
+    reads by reading in 4 lines at a time. Every read will be returned  as a 
+    list of 4. As for now, the fastq file won't be validated. Thus errors 
+    won't be detected or handled properly.
     Arg:
         fastq: Path, including name, of one fastq file.
     Yield:
@@ -366,7 +406,8 @@ def main():
                         default=None)
 
     args = parser.parse_args()
-    if args.subcom == 'process_fastq':
+    if (not args.sequence and not (args.barcode-index and args.barcode-file) 
+       and not args.randomer):
         process_fastq(args.fastq, bc_bp=args.barcode, slice_bp=args.slice,
 					  index_bp=args.index, output=args.outfastq)
     else:

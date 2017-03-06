@@ -17,7 +17,7 @@ A collection of bioinformatic tools customized to my needs.
 &nbsp;&nbsp;&nbsp;Argument&nbsp;&nbsp;&nbsp;|Help message
 ---|---
 -i|Illumina fastq sequencing file(s). Support multi-file input. A separated result folder and report will be generated for each fastq input.
--x, --index|Basepair position for library indices. Fastq file will be demultiplex accordingly
+-x, --index|Basepair position for library indexes. Fastq file will be demultiplex accordingly
 -r, --randomer|Basepair position for randomer, which indicates unique DNA/RNA molecules before PCR. Support both discrete and continuous regions. Discrete regions are separated by ",", and continuous region is expressed as "a:b". For example: "1:9,31:50" stands for a sequence combining nucleotides from position 1 to position 9 with nucleotides from position 31 to position 50.
 -o, --outpath|Path for outputs. Default is the same directory as input fastq(s).
 -h, --help|Show this help message and exit.
