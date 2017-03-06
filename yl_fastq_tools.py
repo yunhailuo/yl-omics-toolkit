@@ -63,9 +63,26 @@ def fastq_reader(fastq):
                 yield read
 
 
-def _fastq_slicer(idxs-arg):
+def _fastq_slicer(idxs_arg):
+    """
+    teststr[testarg]
+    """
+    
+    slicer_array = []
+    for idx_slice in idxs_arg.split(',')
+        if ':' in idx_slice:
+            i, j = idx_str.split(':')
+            if i == '':
+                i = 1
+            if j == '':
+                slicer_array.append((int(i)-1, None))
+            else:
+                slicer_array.append((int(i)-1, int(j)))
+        else:
+            slicer_array.append((int(idx_slice)-1, int(idx_slice)))
+    return slicer_array
 
-
+    
 def fastq_writer():
 
 
