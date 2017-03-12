@@ -48,7 +48,8 @@ def attach_barcode(sam, output):
     for read in infile.fetch():
         id_sam = read.query_name
         sep_si = id_sam.index(':')
-# TODO Abort and throw error if randomer info is not kept properly in the read's name.
+# TODO Abort and raise exception if randomer info is not kept properly in the 
+#      read's name.
         bc_seq = id_sam[0:sep_si]
         sep_qi = sep_si + 1 + len(bc_seq)
         bc_pqs = id_sam[sep_si + 1: sep_qi]
