@@ -100,15 +100,15 @@ def _fastq_slicers(idxs_arg):
     slicer_array = []
     for idx_slice in idxs_arg.split(','):
         if ':' in idx_slice:
-            i, j = idx_str.split(':')
+            i, j = idx_slice.split(':')
             if i == '':
                 i = 1
             if j == '':
-                slicer_array.append((int(i)-1, None))
+                slicer_array.append(slice(int(i)-1, None))
             else:
-                slicer_array.append((int(i)-1, int(j)))
+                slicer_array.append(slice(int(i)-1, int(j)))
         else:
-            slicer_array.append((int(idx_slice)-1, int(idx_slice)))
+            slicer_array.append(slice(int(idx_slice)-1, int(idx_slice)))
     return slicer_array
 
 
@@ -131,8 +131,8 @@ def _barcode_file_map(bcfile_arg):
             points to.
     """
     
-    bc_file_dict = []
-    for bc_file_tuple in bc_file_dict.split(';'):
+    bc_file_dict = {}
+    for bc_file_tuple in bcfile_arg.split(';'):
         barcodes, fastq_name = bc_file_tuple.split(':')
         fastq_file = open(fastq_name, 'w')
         for barcode_seq in barcodes.split(','):
@@ -256,12 +256,12 @@ def proc_fastq(fastq, seq_idx = None, bc_idx = None, bc_file = None,
         read.append('') # So that the last line has EOL after .join
         output.write('\n'.join(read))
 
-        # Close all output files
-        if bc_idx:
-            for file in bc_file_map.itervalues():
-                file.close()
-            output = undetermined_index
-        output.close()
+    # Close all output files
+    if bc_idx:
+        for file in bc_file_map.itervalues():
+            file.close()
+        output = undetermined_index
+    output.close()
 
     return None
 
@@ -425,10 +425,10 @@ def main():
                                                  'for downstream analysis.')
     parser.add_argument('-f', '--fastq',
                         help='One fastq file from Illumina sequencing. Fastq '
-                             'files resulting from other platforms have not '
-                             'been tested. Though pair end reads can be '
-                             'processed separately, it is not recommended since'
-                             ' it may uncouple the pair.',
+                             'files coming from other platforms have not been '
+                             'tested. Though pair end reads can be processed '
+                             'separately, it is not recommended since it may '
+                             'uncouple the pair.',
                         required=True)
     parser.add_argument('-s', '--sequence',
                         help='Basepair position for target sequences which '
@@ -497,13 +497,13 @@ def main():
                         default=None)
 
     args = parser.parse_args()
-    if (not args.sequence and not (args.bcindex and args.bcfile) 
-       and not args.randomer):
-        process_fastq(args.fastq, args.sequence, args.bcindex, args.bcfile, 
-                      args.randomer)
-    else:
+    if (args.sequence is None and (args.bcindex is None or args.bcfile is None) 
+       and args.randomer is None):
         parser.print_help()
         exit(1)
+    else:
+        proc_fastq(args.fastq, args.sequence, args.bcindex, args.bcfile, 
+                      args.randomer, args.output)
 
 
 if __name__ == '__main__':
