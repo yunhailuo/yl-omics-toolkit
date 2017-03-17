@@ -36,18 +36,26 @@ A collection of bioinformatic tools customized to my needs.
 ## Process randomer for Picard on marking PCR duplicates
 ### 1. Extract randomer from fastq and align to reference
 Command example:
+
 `python yl_fastq_tools.py -f input.fastq -s 31:50 -r 1:9 -o $DIR/input_randomer.fastq`
+
 Randomer sequence and corresponding sequencing quality score will be extracted and stored in the sequence identifier (the first line of a read). For example, the following read:
+
     @M02357:256:000000000-ARWLK:1:1101:23366:8048 1:N:0:1
     CGATGTGCTTGTGGAAAGGACGAAACACCGCTGATGGAATAGGAAGCCGTGTTTAAGAGCTATGCTGGAAACAGCA
     \+
     A1AAA1F3DFF1AAFGEAGFFEEEFAHGEGE0A/BA10FBAA1FFCAGAGGFFFFEAGBGEHFFDGDCGF@FF>GH
+
 will be transformed to:
+
     @CGATGTGCT:A1AAA1F3D:M02357:256:000000000-ARWLK:1:1101:23366:8048 1:N:0:1
     CTGATGGAATAGGAAGCCGT
     \+
     E0A/BA10FBAA1FFCAGAG
+
 The output fastq can now be aligned using your aligner of choice. For example,
+
 `bowtie2 -L 20 -N 0 --no-1mm-upfront -x reference -U $DIR/input_randomer.fastq -S $DIR/input.sam`
+
 ### 2. Attach randomer to the BC&QT tag in the sam file
 ### 3. Picard MarkDuplicates with BARCODE_TAG option
