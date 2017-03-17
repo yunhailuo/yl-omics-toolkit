@@ -77,7 +77,7 @@ def main():
                         required=True)
     parser.add_argument('-o', '--outsam',
                         help='Output unsorted sam file. Default is to add a '
-                             '"_bcs" postfix and save in the same directory.',
+                             '"_bcqt" postfix and save in the same directory.',
                         default=None)
 
     args = parser.parse_args()
