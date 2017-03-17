@@ -6,7 +6,7 @@ A collection of bioinformatic tools customized to my needs.
   - [yl_fastq_tools](#user-content-yl_fastq_tools)
   - [yl_sam_tools](#user-content-yl_sam_tools)
 - [Process randomer for Picard on marking PCR duplicates](#user-content-process-randomer-for-picard-on-marking-pcr-duplicates)
-  - [1. Extract randomer from fastq](#user-content-1-extract-randomer-from-fastq)
+  - [1. Extract randomer from fastq and align to reference](#user-content-1-extract-randomer-from-fastq-and-align-to-reference)
   - [2. Attach randomer to the BC&QT tag in the sam file](#user-content-2-attach-randomer-to-the-bcqt-tag-in-the-sam-file)
   - [3. Picard MarkDuplicates with BARCODE_TAG option](#user-content-3-picard-markduplicates-with-barcode_tag-option)
 
@@ -29,11 +29,25 @@ A collection of bioinformatic tools customized to my needs.
 &nbsp;&nbsp;&nbsp;Argument&nbsp;&nbsp;&nbsp;|Help message
 ---|---
 -s --sam|One aligned sam file which needs to attach barcodes at BC&QT tags. The barcode and its sequencing quality should have been stored in the read's name, separated by ":". Check "yl_fastq_tools" module for detailed formats.
--o, --outsam|Output unsorted sam file. Default is to add a "_bcs" postfix and save in the same directory.
+-o, --outsam|Output unsorted sam file. Default is to add a "_bcqt" postfix and save in the same directory.
 -h, --help|Show this help message and exit.
 
 
 ## Process randomer for Picard on marking PCR duplicates
-### 1. Extract randomer from fastq
+### 1. Extract randomer from fastq and align to reference
+Command example:
+`python yl_fastq_tools.py -f input.fastq -s 31:50 -r 1:9 -o $DIR/input_randomer.fastq`
+Randomer sequence and corresponding sequencing quality score will be extracted and stored in the sequence identifier (the first line of a read). For example, the following read:
+    @M02357:256:000000000-ARWLK:1:1101:23366:8048 1:N:0:1
+    CGATGTGCTTGTGGAAAGGACGAAACACCGCTGATGGAATAGGAAGCCGTGTTTAAGAGCTATGCTGGAAACAGCA
+    \+
+    A1AAA1F3DFF1AAFGEAGFFEEEFAHGEGE0A/BA10FBAA1FFCAGAGGFFFFEAGBGEHFFDGDCGF@FF>GH
+will be transformed to:
+    @CGATGTGCT:A1AAA1F3D:M02357:256:000000000-ARWLK:1:1101:23366:8048 1:N:0:1
+    CTGATGGAATAGGAAGCCGT
+    \+
+    E0A/BA10FBAA1FFCAGAG
+The output fastq can now be aligned using your aligner of choice. For example,
+`bowtie2 -L 20 -N 0 --no-1mm-upfront -x reference -U $DIR/input_randomer.fastq -S $DIR/input.sam`
 ### 2. Attach randomer to the BC&QT tag in the sam file
 ### 3. Picard MarkDuplicates with BARCODE_TAG option
