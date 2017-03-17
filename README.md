@@ -37,25 +37,50 @@ A collection of bioinformatic tools customized to my needs.
 ### 1. Extract randomer from fastq and align to reference
 Command example:
 
-`python yl_fastq_tools.py -f input.fastq -s 31:50 -r 1:9 -o $DIR/input_randomer.fastq`
+`python yl_fastq_tools.py -f input.fastq -s 31:50 -r 1:9 -o input_randomer.fastq`
 
-Randomer sequence and corresponding sequencing quality score will be extracted and stored in the sequence identifier (the first line of a read). For example, the following read:
+Randomer sequence and corresponding sequencing quality score will be extracted and stored in the sequence identifier (the first line of a read), separated by ":". For example, the following read:
 
     @M02357:256:000000000-ARWLK:1:1101:23366:8048 1:N:0:1
     CGATGTGCTTGTGGAAAGGACGAAACACCGCTGATGGAATAGGAAGCCGTGTTTAAGAGCTATGCTGGAAACAGCA
-    \+
+    +
     A1AAA1F3DFF1AAFGEAGFFEEEFAHGEGE0A/BA10FBAA1FFCAGAGGFFFFEAGBGEHFFDGDCGF@FF>GH
 
 will be transformed to:
 
     @CGATGTGCT:A1AAA1F3D:M02357:256:000000000-ARWLK:1:1101:23366:8048 1:N:0:1
     CTGATGGAATAGGAAGCCGT
-    \+
+    +
     E0A/BA10FBAA1FFCAGAG
 
 The output fastq can now be aligned using your aligner of choice. For example,
 
-`bowtie2 -L 20 -N 0 --no-1mm-upfront -x reference -U $DIR/input_randomer.fastq -S $DIR/input.sam`
+`bowtie2 -L 20 -N 0 --no-1mm-upfront -x reference -U input_randomer.fastq -S input.sam`
 
+In the sam output, randomer information will be in the "Query template NAME".
 ### 2. Attach randomer to the BC&QT tag in the sam file
+Command example:
+
+`python yl_sam_tools.py -s input.sam -o input_bcqt.sam`
+
+Randomer sequence will be moved from the "Query template NAME" to the BC tag and corresponding sequencing quality score will be moved from the "Query template NAME" to the QT tag. For example, the following alignment:
+
+    CGATGTGCT:A1AAA1F3D:M02357:256:000000000-ARWLK:1:1101:23366:8048	0	Cacna1s:Cacna1s_1	1	42	20M	*	0	0	CTGATGGAATAGGAAGCCGT	E0A/BA10FBAA1FFCAGAG	AS:i:0	XN:i:0	XM:i:0	XO:i:0	XG:i:0	NM:i:0	MD:Z:20	YT:Z:UU
+
+will be changed to:
+
+    M02357:256:000000000-ARWLK:1:1101:23366:8048	0	Cacna1s:Cacna1s_1	1	42	20M	*	0	0	CTGATGGAATAGGAAGCCGT	E0A/BA10FBAA1FFCAGAG	AS:i:0	XN:i:0	XM:i:0	XO:i:0	XG:i:0	NM:i:0	MD:Z:20	YT:Z:UU	BC:Z:CGATGTGCT	QT:Z:A1AAA1F3D
+
 ### 3. Picard MarkDuplicates with BARCODE_TAG option
+According to the Picard Documentation, MarkDuplicates 
+> ...can take either coordinate-sorted or query-sorted inputs, however the behavior is slightly different. When the input is coordinate-sorted, unmapped mates of mapped records and supplementary/secondary alignments are not marked as duplicates. However, when the input is query-sorted (actually query-grouped), then unmapped mates and secondary/supplementary reads are not excluded from the duplication test and can be marked as duplicate reads.
+
+Therefore, in order to MarkDuplicates with BARCODE_TAG option, sort the sam file based on query name first.
+
+`java -Xmx2g -jar picard.jar SortSam I=input_bcqt.sam O=input_bcqt_sorted.sam SORT_ORDER=queryname`
+
+Then remove duplicates using:
+
+`java -Xmx2g -jar picard.jar MarkDuplicates I=input_bcqt_sorted.sam O=input_bcqt_sorted_dedup.sam M=picard_dedup.stats BARCODE_TAG=BC REMOVE_DUPLICATES=True`
+
+Now what left should be unique DNA/cDNA fragments before doing PCR amplification during library preparation.
