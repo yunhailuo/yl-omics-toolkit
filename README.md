@@ -5,6 +5,7 @@ A collection of bioinformatic tools customized to my needs.
 - [Usage](#user-content-usage)
   - [yl_fastq_tools](#user-content-yl_fastq_tools)
   - [yl_sam_tools](#user-content-yl_sam_tools)
+  - [transcript_length](#user-content-transcript_length)
 - [Process randomer for Picard on marking PCR duplicates](#user-content-process-randomer-for-picard-on-marking-pcr-duplicates)
   - [1. Extract randomer from fastq and align to reference](#user-content-1-extract-randomer-from-fastq-and-align-to-reference)
   - [2. Attach randomer to the BC&QT tag in the sam file](#user-content-2-attach-randomer-to-the-bcqt-tag-in-the-sam-file)
@@ -30,6 +31,14 @@ A collection of bioinformatic tools customized to my needs.
 ---|---
 -s --sam|One aligned sam file which needs to attach barcodes at BC&QT tags. The barcode and its sequencing quality should have been stored in the read's name, separated by ":". Check "yl_fastq_tools" module for detailed formats.
 -o, --outsam|Output unsorted sam file. Default is to add a "_bcqt" postfix and save in the same directory.
+-h, --help|Show this help message and exit.
+### transcript_length.py
+`transcript_length.py [-h] [-o OUTPUT] GFF`
+### Arguments
+&nbsp;&nbsp;&nbsp;Argument&nbsp;&nbsp;&nbsp;|Help message
+---|---
+GFF|One input GTF/GFF2/GFF3 file from which the length of transcript for each gene will be calculated.
+-o, --output|Optional. Specify path and filename for output gene length table. Default saving directory is that of the input file and default filename is "transcript_length.tsv".
 -h, --help|Show this help message and exit.
 
 
