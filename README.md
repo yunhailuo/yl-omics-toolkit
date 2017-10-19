@@ -32,7 +32,7 @@ A collection of bioinformatic tools customized to my needs.
 -s --sam|One aligned sam file which needs to attach barcodes at BC&QT tags. The barcode and its sequencing quality should have been stored in the read's name, separated by ":". Check "yl_fastq_tools" module for detailed formats.
 -o, --outsam|Output unsorted sam file. Default is to add a "_bcqt" postfix and save in the same directory.
 -h, --help|Show this help message and exit.
-### transcript_length.py
+### transcript_length
 `transcript_length.py [-h] [-o OUTPUT] GFF`
 ### Arguments
 &nbsp;&nbsp;&nbsp;Argument&nbsp;&nbsp;&nbsp;|Help message
